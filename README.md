@@ -16,18 +16,16 @@ scripts for downloading and tagging images from booru websites
 
 `torsocks` if you're downloading through tor
 
-```
-./gelbdl.sh [-t] [-s]
-Simply make a files.txt inside a folder and paste all your links, then run this script to download them all!
-        -h      shows this help message
-        -t      downloads using tor (requires torsocks)
-        -s      sets the delay after each request, defaults to 1
-```
+## Scripts:
 
-```
-./gelbtag.sh [-t] [-s]
-Tags existing pictures inside a folder
-        -h      shows this help message
-        -t      downloads using tor (requires torsocks)
-        -s      sets the delay after each request, defaults to 1
-```
+`gelbdl.sh` downloads and tags files from every gelbooru link in files.txt
+
+`gelbtag.sh` hashes and looks up every image in a folder on gelbooru
+
+`dandl.sh` downloads and tags files from every danbooru link in files.txt
+
+`dantag.sh` hashes and looks up every image in a folder on danbooru
+
+`moedl.sh` downloads and tags files from moebooru imageboard (think konachan and yande.re) links in files.txt
+
+`moetag.sh` hashes and looks up every image in a folder (provided you specify the booru)

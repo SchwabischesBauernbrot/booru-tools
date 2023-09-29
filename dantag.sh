@@ -2,10 +2,11 @@
 
 USE_TOR=false
 DELAY=1
+SEARCH_URL="https://danbooru.donmai.us/posts.json?tags=md5"
 
 function usage {
 		echo "./$(basename $0) [-t] [-s]"
-        echo "Mass tagger for Gelbooru"
+        echo "Mass tagger for Danbooru"
 		echo "Tags existing pictures inside a folder"
         echo "	-h	shows this help message"
 		echo "	-t	downloads using tor (requires torsocks)"
@@ -46,12 +47,12 @@ for FILE in *; do
 	FILE_MD5=`md5sum "$FILE" | awk '{print $1}'`
 	# DOWNLOAD JSON
 		if $USE_TOR; then
-		JSON=`torsocks curl -s "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&tags=md5:$FILE_MD5" | jq .`
+		JSON=`torsocks curl -s "$SEARCH_URL:$FILE_MD5"`
 	else
-		JSON=`curl -s "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&tags=md5:$FILE_MD5" | jq .`
+		JSON=`curl -s "$SEARCH_URL:$FILE_MD5"`
 	fi
 	# STORE TAGS INTO VARIABLES
-	FILE_TAGS=`echo $JSON | jq -r '.post | .[] | ."tags"' | sed 's/\ /,/g'`
+	FILE_TAGS=`echo $JSON | jq -r '.[] | ."tag_string"' | sed 's/\ /,/g'`
 	# ADD TAGS TO IMAGE
 	setfattr -n user.xdg.tags -v "$FILE_TAGS" "$FILE"
 	# DELAY BEFORE NEXT FETCH
