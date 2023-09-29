@@ -2,13 +2,19 @@
 
 scripts for downloading and tagging images from booru websites
 
-stores tags in `user.xdg.tags` xattr
+- stores tags in `user.xdg.tags` xattr
 
-tags work with KDE dolphin / KDE's baloo file indexer, idk about other desktop environments
+- tags work with KDE dolphin / KDE's baloo file indexer, idk about other desktop environments
 
-see https://wiki.archlinux.org/title/Extended_attributes
+- see https://wiki.archlinux.org/title/Extended_attributes
 
-These took me a whole morning to write. Its very much WIP...
+- These took me a whole morning to write. Its very much WIP...
+
+## Depends on:
+
+`jq` for json parsing
+
+`torsocks` if you're downloading through tor
 
 ```
 ./gelbdl.sh [-t] [-s]
