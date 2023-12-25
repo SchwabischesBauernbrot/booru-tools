@@ -4,7 +4,7 @@ USE_TOR=false
 DELAY=1
 
 function usage {
-		echo "./$(basename $0) [-t] [-s]"
+		echo "./$(basename "$0") [-t] [-s]"
         echo "Mass downloader for Danbooru"
 		echo "Simply make a files.txt inside a folder and paste all your links, then run this script to download them all!"
         echo "	-h	shows this help message"
@@ -40,21 +40,22 @@ while getopts ${optstring} arg; do
 	esac
 done
 
-while read f; do
+while read -r f; do
 	echo "$f"
 	# MODIFY URL TO API CALL
-	JSON_URL=`echo $f | sed "s/\?q.*//g"`
+	# shellcheck disable=SC2001
+	JSON_URL=$(echo "$f" | sed "s/\?q.*//g")
 	# DOWNLOAD JSON
 	if $USE_TOR; then
-		JSON=`torsocks curl -s "$JSON_URL.json"`
+		JSON=$(torsocks curl -s "$JSON_URL.json")
 	else
-		JSON=`curl -s "$JSON_URL.json"`
+		JSON=$(curl -s "$JSON_URL.json")
 	fi
 	# STORE FILE URL AND TAGS INTO VARIABLES
-	FILE_URL=`echo $JSON | jq -r '."file_url"'`
-	FILE_TAGS=`echo $JSON  | jq -r '."tag_string"' | sed 's/\ /,/g'`
-    FILE_MD5=`echo $JSON | jq -r '.md5'`
-	FILE_EXT=`echo $JSON | jq -r '.file_ext'`
+	FILE_URL=$(echo "$JSON" | jq -r '."file_url"')
+	FILE_TAGS=$(echo "$JSON"  | jq -r '."tag_string"' | sed 's/\ /,/g')
+    FILE_MD5=$(echo "$JSON" | jq -r '.md5')
+	FILE_EXT=$(echo "$JSON" | jq -r '.file_ext')
     FILE="$FILE_MD5.$FILE_EXT"
 	# DOWNLOAD FILE
 	if $USE_TOR; then
@@ -63,8 +64,8 @@ while read f; do
 		curl -O -J "$FILE_URL"
 	fi
 	# ADD TAGS TO NEW IMAGE
-	setfattr -n user.xdg.tags -v "$FILE_TAGS" "$FILE_MD5"*
-	setfattr --name=user.checksum --value="$FILE_MD5" "$FILE_MD5"*
+	setfattr -n user.xdg.tags -v "$FILE_TAGS" "$FILE"
+	setfattr --name=user.checksum --value="$FILE_MD5" "$FILE"
 	# DELAY BEFORE NEXT FETCH
-	sleep $DELAY
+	sleep "$DELAY"
 done < files.txt

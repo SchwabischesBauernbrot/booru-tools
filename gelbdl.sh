@@ -5,7 +5,7 @@ DELAY=1
 USE_DATE=false
 
 function usage {
-		echo "./$(basename $0) [-t] [-s 1] [-d]"
+		echo "./$(basename "$0") [-t] [-s 1] [-d]"
         echo "Mass downloader for Gelbooru"
 		echo "Simply make a files.txt inside a folder and paste all your links, then run this script to download them all!"
         echo "	-h	shows this help message"
@@ -46,27 +46,27 @@ while getopts ${optstring} arg; do
 	esac
 done
 
-while read f; do
+while read -r f; do
 	echo "$f"
 	# MODIFY URL TO API CALL
-	JSON_URL=`echo $f | sed 's/page=post/page=dapi\&json=1\&q=index/g' | sed 's/s=view/s=post/g' | sed "s/\&tags.*//g"`
+	JSON_URL=$(echo "$f" | sed 's/page=post/page=dapi\&json=1\&q=index/g' | sed 's/s=view/s=post/g' | sed "s/\&tags.*//g")
 	# DOWNLOAD JSON
 	if $USE_TOR; then
-		JSON=`torsocks curl -s $JSON_URL | jq .`
+		JSON=$(torsocks curl -s "$JSON_URL" | jq .)
 	else
-		JSON=`curl -s $JSON_URL | jq .`
+		JSON=$(curl -s "$JSON_URL" | jq .)
 	fi
 	# STORE FILE URL AND TAGS INTO VARIABLES
-	FILE_URL=`echo $JSON | jq -r '.post | .[] | ."file_url"'`
-	FILE_TAGS=`echo $JSON | jq -r '.post | .[] | ."tags"' | sed 's/\ /,/g'`
-	FILE_MD5=`echo $JSON | jq -r '.post | .[] | ."md5"'`
-	FILE_DATE=`echo $JSON | jq -r '.post | .[] | ."created_at"'`
-	FILE=`echo $FILE_URL | sed 's/\// /g' | awk '{print $NF}'`
+	FILE_URL=$(echo "$JSON" | jq -r '.post | .[] | ."file_url"')
+	FILE_TAGS=$(echo "$JSON" | jq -r '.post | .[] | ."tags"' | sed 's/\ /,/g')
+	FILE_MD5=$(echo "$JSON" | jq -r '.post | .[] | ."md5"')
+	FILE_DATE=$(echo "$JSON" | jq -r '.post | .[] | ."created_at"')
+	FILE=$(echo "$FILE_URL" | sed 's/\// /g' | awk '{print $NF}')
 	# DOWNLOAD FILE
 	if $USE_TOR; then
-		torsocks curl -O -J $FILE_URL
+		torsocks curl -O -J "$FILE_URL"
 	else
-		curl -O -J $FILE_URL
+		curl -O -J "$FILE_URL"
 	fi
 	# ADD TAGS TO NEW IMAGE
 	setfattr -n user.xdg.tags -v "$FILE_TAGS" "$FILE"
@@ -75,5 +75,5 @@ while read f; do
 		touch -d "$FILE_DATE" "$FILE"
 	fi
 	# DELAY BEFORE NEXT FETCH
-	sleep $DELAY
+	sleep "$DELAY"
 done < files.txt

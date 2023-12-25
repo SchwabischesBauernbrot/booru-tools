@@ -2,17 +2,15 @@
 
 USE_TOR=false
 DELAY=1
-LIMIT=200
 
 function usage {
-		echo "./$(basename $0) [-t] [-s] [-l] -a tag -a tag2"
+		echo "./$(basename "$0") [-t] [-s] [-l] -a tag -a tag2"
         echo "Mass downloader for Gelbooru"
 		echo "Simply make a files.txt inside a folder and paste all your links, then run this script to download them all!"
         echo "	-h	shows this help message"
 		echo "	-t	downloads using tor (requires torsocks)"
 		echo "	-s	sets the delay after each request, defaults to 1"
 		echo "	-a	tag or artist name"
-		echo "	-l	limit of single json request (defaults to 100)"
 }
 
 # list of arguments expected in the input
@@ -35,9 +33,6 @@ while getopts ${optstring} arg; do
 		a)
 			TAGS+=("$OPTARG")
 			;;
-		l)
-			LIMIT="${OPTARG}"
-			;;
 		:)
 			echo "$0: Must supply an argument to -$OPTARG." >&2
 			exit 1
@@ -50,15 +45,15 @@ while getopts ${optstring} arg; do
 done
 
 for TAG in "${TAGS[@]}"; do
-	echo $TAG
+	echo "$TAG"
 	# CREATE FOLDER AND CD INTO IT
 	mkdir -v $TAG
 	cd $TAG
 	# GET TAG TOTAL COUNT
 	if $USE_TOR; then
-		TAG_COUNT=`torsocks curl -s "https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&name=$TAG" | jq -r '."tag" | .[] | ."count"'`
+		TAG_COUNT=$(torsocks curl -s "https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&name=$TAG" | jq -r '."tag" | .[] | ."count"')
 	else
-		TAG_COUNT=`curl -s "https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&name=$TAG" | jq -r '."tag" | .[] | ."count"'`
+		TAG_COUNT=$(curl -s "https://gelbooru.com/index.php?page=dapi&s=tag&q=index&json=1&name=$TAG" | jq -r '."tag" | .[] | ."count"')
 	fi
 
 	# NESTED LOOP TO GET ALL POSTS UNDER TAG
@@ -66,34 +61,34 @@ for TAG in "${TAGS[@]}"; do
 	for (( PAGE = 0; PAGE <= $TAG_PAGES; PAGE++ ))
 	do
 		if $USE_TOR; then
-			JSON+=`torsocks curl -s "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&pid=$PAGE&tags=$TAG" | jq -r '.post'`
+			JSON+=$(torsocks curl -s "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&pid=$PAGE&tags=$TAG" | jq -r '.post')
 		else
-			JSON+=`curl -s "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&pid=$PAGE&tags=$TAG" | jq -r '.post'`
+			JSON+=$(curl -s "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&pid=$PAGE&tags=$TAG" | jq -r '.post')
 		fi
-		sleep $DELAY
+		sleep "$DELAY"
 	done
 
 	# NESTED LOOP FOR IMAGES IN THIS TAG
-	echo $JSON | jq -c '.[]' | while read i; do
+	echo "$JSON" | jq -c '.[]' | while read i; do
 		#echo $i | jq -r '."id"'
-		FILE_DATE=`echo $i | jq -r '."created_at"'`
-		FILE_URL=`echo $i | jq -r '."file_url"'`
-		FILE_MD5=`echo $i | jq -r '."md5"'`
-		FILE_TAGS=`echo $i | jq -r '."tags"' | sed 's/\ /,/g'`
-		FILE=`echo $FILE_URL | sed 's/\// /g' | awk '{print $NF}'`
+		FILE_DATE=$(echo "$i" | jq -r '."created_at"')
+		FILE_URL=$(echo "$i" | jq -r '."file_url"')
+		FILE_MD5=$(echo "$i" | jq -r '."md5"')
+		FILE_TAGS=$(echo "$i" | jq -r '."tags"' | sed 's/\ /,/g')
+		FILE=$(echo "$FILE_URL" | sed 's/\// /g' | awk '{print $NF}')
 
 		# DOWNLOAD FILE
 		if $USE_TOR; then
-			torsocks curl -O -J $FILE_URL
+			torsocks curl -O -J "$FILE_URL"
 		else
-			curl -O -J $FILE_URL
+			curl -O -J "$FILE_URL"
 		fi
 		# ADD TAGS TO NEW IMAGE
 		setfattr -n user.xdg.tags -v "$FILE_TAGS" "$FILE"
 		setfattr --name=user.checksum --value="$FILE_MD5" "$FILE"
 		touch -d "$FILE_DATE" "$FILE"
 		# DELAY BEFORE NEXT FETCH
-		sleep $DELAY
+		sleep "$DELAY"
 	done
 	# BACK OUT OF FOLDER
 	cd ..
