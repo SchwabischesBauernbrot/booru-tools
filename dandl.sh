@@ -63,7 +63,8 @@ while read f; do
 		curl -O -J "$FILE_URL"
 	fi
 	# ADD TAGS TO NEW IMAGE
-	setfattr -n user.xdg.tags -v "$FILE_TAGS" "$FILE"
+	setfattr -n user.xdg.tags -v "$FILE_TAGS" "$FILE_MD5"*
+	setfattr --name=user.checksum --value="$FILE_MD5" "$FILE_MD5"*
 	# DELAY BEFORE NEXT FETCH
 	sleep $DELAY
 done < files.txt

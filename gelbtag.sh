@@ -2,6 +2,7 @@
 
 USE_TOR=false
 DELAY=1
+USE_DATE=false
 
 function usage {
 		echo "./$(basename $0) [-t] [-s]"
@@ -10,10 +11,12 @@ function usage {
         echo "	-h	shows this help message"
 		echo "	-t	downloads using tor (requires torsocks)"
 		echo "	-s	sets the delay after each request, defaults to 1"
+		echo "	-d	sets the date of the file downloaded to the date it was uploaded to Gelbooru"
+
 }
 
 # list of arguments expected in the input
-optstring=":hts:"
+optstring=":hts:d"
 
 while getopts ${optstring} arg; do
 	case ${arg} in
@@ -28,6 +31,9 @@ while getopts ${optstring} arg; do
 			;;
 		s)
 			DELAY="${OPTARG}"
+			;;
+		d)
+			USE_DATE=true
 			;;
 		:)
 			echo "$0: Must supply an argument to -$OPTARG." >&2
@@ -52,8 +58,12 @@ for FILE in *; do
 	fi
 	# STORE TAGS INTO VARIABLES
 	FILE_TAGS=`echo $JSON | jq -r '.post | .[] | ."tags"' | sed 's/\ /,/g'`
+	FILE_DATE=`echo $JSON | jq -r '.post | .[] | ."created_at"'`
 	# ADD TAGS TO IMAGE
 	setfattr -n user.xdg.tags -v "$FILE_TAGS" "$FILE"
+	if $USE_DATE; then
+		touch -d "$FILE_DATE" "$FILE"
+	fi
 	# DELAY BEFORE NEXT FETCH
 	sleep $DELAY
 done

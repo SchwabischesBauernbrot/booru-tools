@@ -8,8 +8,6 @@ scripts for downloading and tagging images from booru websites
 
 - see https://wiki.archlinux.org/title/Extended_attributes
 
-- These took me a whole morning to write. Its very much WIP...
-
 ## Depends on:
 
 `jq` for json parsing
@@ -29,3 +27,9 @@ scripts for downloading and tagging images from booru websites
 `moedl.sh` downloads and tags files from moebooru imageboard (think konachan and yande.re) links in files.txt
 
 `moetag.sh` hashes and looks up every image in a folder (provided you specify the booru)
+
+## BUGS
+
+Until federation is added to gitea, I can't do issues here :(
+
+Please feel free to reach out to me on fedi at [@bronze@pl.kitsunemimi.club](https://pl.kitsunemimi.club/users/bronze) , [@bronze@wolfgirl.bar](https://wolfgirl.bar/users/bronze) or by email at [    bronze@kitsunemimi.club](mailto:bronze@kitsunemimi.club)
