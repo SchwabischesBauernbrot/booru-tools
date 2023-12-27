@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 12/26/2023
+
+### ADDED
+- added `-r` resume option under `*-tag.sh` scripts
+- added `dandl-tag.sh` and `moedl-tag.sh`
+
 ## 12/25/2023 (Merry Christmas!)
 
 ### FIXED
