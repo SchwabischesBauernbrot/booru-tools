@@ -2,7 +2,7 @@
 
 USE_TOR=false
 DELAY=1
-RESUME=false
+RECENT=false
 URL="konachan.com"
 
 function usage {
@@ -38,7 +38,7 @@ while getopts ${optstring} arg; do
 			TAGS+=("$OPTARG")
 			;;
 		r)
-			RESUME=true
+			RECENT=true
 			;;
 		c)
 			URL="${OPTARG}"
@@ -95,7 +95,7 @@ for TAG in "${TAGS[@]}"; do
 		FILE_TAGS=$(echo "$JSON" | jq -r '.[] | ."tags"' | sed 's/\ /,/g')
 		FILE=$(echo "$JSON" | jq -r '.[] | ."file_url"' | sed 's/\// /g' | awk '{print $5}')
 		FILE_WITHSPACE=$(echo "$JSON" | jq -r '.[] | ."file_url"' | sed 's/\// /g' | awk '{print $5}' | sed 's/\%20/ /g')
-		if $RESUME; then
+		if $RECENT; then
 			if [[ -f "$FILE_WITHSPACE" ]]; then
 				echo "$FILE_WITHSPACE exists."
 				exit

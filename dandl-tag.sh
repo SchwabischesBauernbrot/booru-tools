@@ -2,7 +2,7 @@
 
 USE_TOR=false
 DELAY=1
-RESUME=false
+RECENT=false
 
 function usage {
 		echo "./$(basename "$0") [-t] [-s] [-r]"
@@ -36,7 +36,7 @@ while getopts ${optstring} arg; do
 			TAGS+=("$OPTARG")
 			;;
 		r)
-			RESUME=true
+			RECENT=true
 			;;
 		:)
 			echo "$0: Must supply an argument to -$OPTARG." >&2
@@ -91,7 +91,7 @@ for TAG in "${TAGS[@]}"; do
 		FILE_MD5=$(echo "$JSON" | jq -r '.md5')
 		FILE_EXT=$(echo "$JSON" | jq -r '.file_ext')
 		FILE="$FILE_MD5.$FILE_EXT"
-		if $RESUME; then
+		if $RECENT; then
 			if [[ -f "$FILE" ]]; then
 				echo "$FILE exists."
 				exit

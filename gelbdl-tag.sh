@@ -2,7 +2,7 @@
 
 USE_TOR=false
 DELAY=1
-RESUME=false
+RECENT=false
 
 function usage {
 		echo "./$(basename "$0") [-t] [-s] [-r] -a tag -a tag2"
@@ -12,6 +12,7 @@ function usage {
 		echo "	-t	downloads using tor (requires torsocks)"
 		echo "	-s	sets the delay after each request, defaults to 1"
 		echo "	-a	tag or artist name"
+		echo "	-r	will download until it hits a file that already exists"
 }
 
 # list of arguments expected in the input
@@ -35,7 +36,7 @@ while getopts ${optstring} arg; do
 			TAGS+=("$OPTARG")
 			;;
 		r)
-			RESUME=true
+			RECENT=true
 			;;
 		:)
 			echo "$0: Must supply an argument to -$OPTARG." >&2
@@ -81,7 +82,7 @@ for TAG in "${TAGS[@]}"; do
 		FILE_TAGS=$(echo "$i" | jq -r '."tags"' | sed 's/\ /,/g')
 		FILE=$(echo "$FILE_URL" | sed 's/\// /g' | awk '{print $NF}')
 
-		if $RESUME; then
+		if $RECENT; then
 			if [[ -f "$FILE" ]]; then
 				echo "$FILE exists."
 				exit
