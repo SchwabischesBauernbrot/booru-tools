@@ -28,8 +28,14 @@ scripts for downloading and tagging images from booru websites
 
 `moetag.sh` hashes and looks up every image in a folder (provided you specify the booru)
 
+`e621dl.sh` downloads and tags files from every e621 link in files.txt
+
+`e621tag.sh` hashes and looks up every image in a folder on e621
+
+`*dl-tag.sh` downloads all files found for a given tag
+
 ## BUGS
 
 Until federation is added to gitea, I can't do issues here :(
 
-Please feel free to reach out to me on fedi at [@bronze@pl.kitsunemimi.club](https://pl.kitsunemimi.club/users/bronze) , [@bronze@wolfgirl.bar](https://wolfgirl.bar/users/bronze) or by email at [    bronze@kitsunemimi.club](mailto:bronze@kitsunemimi.club)
+Please feel free to reach out to me on fedi at [@bronze@pl.kitsunemimi.club](https://pl.kitsunemimi.club/users/bronze) , [@bronze@wolfgirl.bar](https://wolfgirl.bar/users/bronze) or by email at [bronze@kitsunemimi.club](mailto:bronze@kitsunemimi.club)
